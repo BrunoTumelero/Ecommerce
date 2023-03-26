@@ -1,0 +1,17 @@
+FROM python:3.8.16-slim
+
+#set directory
+WORKDIR /usr/src/app
+
+#copy requirements
+COPY ./requirements.txt /usr/src/app/requirements.txt
+COPY ./.env /usr/src/app/.env
+
+#install dependencies
+RUN apt-get update -y && \
+    apt-get install -y apt-transport-https ca-certificates && \
+    python3 -m pip install --upgrade pip && \
+    python3 -m pip install -r requirements.txt --no-cache-dir 
+    
+#add app
+COPY . /usr/src/app
