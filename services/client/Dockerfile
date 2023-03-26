@@ -9,6 +9,8 @@ COPY ./.env /usr/src/app/.env
 
 #install dependencies
 RUN apt-get update -y && \
+    apt-get install -y gnupg2 && \
+    apt-get install  gcc g++ musl-dev libpq-dev git -y && \
     apt-get install -y apt-transport-https ca-certificates && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install -r requirements.txt --no-cache-dir 

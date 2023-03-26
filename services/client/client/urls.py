@@ -1,11 +1,10 @@
-from django.contrib import admin
-from django.urls import path
-from django.conf.urls import include, url
+from django.conf.urls import include
+from django.urls import re_path
 
 from client.adm_api import urls as adm_urls
 from client.payment_api import urls as payment_urls
 
 urlpatterns = [
-    url(r'^adm/', include(adm_urls, namespace='adm')),
-    url(r'^payment/', include(payment_urls, namespace='payment')),
+    re_path(r'^adm/', include(adm_urls, namespace='adm')),
+    #re_path(r'^payment/', include(payment_urls, namespace='payment')),
 ]
