@@ -1,17 +1,20 @@
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.conf import settings
+
+from django.utils.translation import gettext_lazy as _
 
 from .managers import UserManager
 
-class BaseModel(models.Model):
+class AbstractBaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         abstract = True
         
-class User(BaseModel):
+class User(AbstractBaseModel, AbstractBaseUser):
     email = models.EmailField('email', unique=True)
     date_joined = models.DateTimeField('date joined', auto_now_add=True)
     is_company = models.BooleanField(default=False)
@@ -22,12 +25,17 @@ class User(BaseModel):
     objects = UserManager()
     
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
     
-class UserSession(BaseModel):
+    class Meta:
+        verbose_name = _("user")
+        verbose_name_plural = _("users")
+    
+class UserSession(AbstractBaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='session_user')
     session_token = models.CharField(max_length=64)
     
-class Clients(BaseModel):
+class Clients(AbstractBaseModel):
 
     GENDER_MALE = "male"
     GENDER_FEMALE = "female"
@@ -38,7 +46,7 @@ class Clients(BaseModel):
         (GENDER_FEMALE, "Feminino"),
         (GENDER_OTHER, "Outro"),
     )
-    user = models.OneToOneField(User,
+    user = models.OneToOneField('register.User',
                                 on_delete=models.CASCADE,
                                 primary_key=True,
                                 related_name='consumer_name')
@@ -81,7 +89,7 @@ class Clients(BaseModel):
             'card': self.card
         }
 
-class ClientsCards(BaseModel):
+class ClientsCards(AbstractBaseModel):
 
     MASTER_CARD = "mastercard"
     VISA_CARD = "visa"
@@ -118,7 +126,7 @@ class ClientsCards(BaseModel):
             'flag': self.flag_card
         }
 
-class Products(BaseModel):
+class Products(AbstractBaseModel):
     product_name = models.CharField(max_length=200)
     picture_url = models.CharField(max_length=200, null=True, blank=True)
     product_description = models.CharField(max_length=300)
@@ -137,7 +145,7 @@ class Products(BaseModel):
             'is_avaliable': self.is_avalable
         }
 
-class ProductCategory(BaseModel):
+class ProductCategory(AbstractBaseModel):
     category = models.CharField(max_length=50)
     description = models.CharField(max_length=200)
     #sub_category = models.ForeignKey('register.SubCategory', on_delete=models.CASCADE, blank=True, null=True, related_name='productcategory_subcategory')
@@ -149,7 +157,7 @@ class ProductCategory(BaseModel):
             'description': self.description
         }
 
-class SubCategory(BaseModel):
+class SubCategory(AbstractBaseModel):
     sub_category = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
     category = models.ForeignKey('register.ProductCategory', on_delete=models.CASCADE, related_name='subcategory_productcategory')
@@ -161,13 +169,13 @@ class SubCategory(BaseModel):
             'description': self.description
         }
         
-class Sales(BaseModel):
+class Sales(AbstractBaseModel):
     product = models.ForeignKey('register.Products', on_delete=models.CASCADE, related_name='company_sales')
     amount = models.CharField('amount', max_length=10)
     value = models.CharField('value', max_length=10)
     payment_complete = models.BooleanField(default=False)
     
-class Shopping_Cart(BaseModel):
+class Shopping_Cart(AbstractBaseModel):
     @property
     def total(self):
         if self.selected:
@@ -194,7 +202,7 @@ class Shopping_Cart(BaseModel):
             'selected': self.selected
         }
 
-class Whishes(BaseModel):
+class Whishes(AbstractBaseModel):
     LOW = 'low'
     MEDIUM = 'medium'
     HIGTH = 'higth'
@@ -222,7 +230,7 @@ class Whishes(BaseModel):
             'amount': self.amount
         }
          
-class ProductsRating(BaseModel):
+class ProductsRating(AbstractBaseModel):
     VERY_LOW = '1'
     LOW = '2'
     NEUTRAL = '3'
@@ -248,14 +256,14 @@ class ProductsRating(BaseModel):
             'rating': self.rating
         }
    
-class Pix(BaseModel):
+class Pix(AbstractBaseModel):
     payer = models.ForeignKey('register.Clients', on_delete=models.CASCADE)
     txid = models.CharField(max_length=32)
     value = models.CharField(max_length=8)
     time = models.CharField(max_length=25)
     return_pix = models.ForeignKey('register.return_pix', on_delete=models.CASCADE)
     
-class Return_pix(BaseModel):
+class Return_pix(AbstractBaseModel):
     payer = models.ForeignKey('register.Clients', on_delete=models.CASCADE)
     _id = models.CharField(max_length=40)
     rtrid = models.CharField(max_length=40)
