@@ -1,8 +1,10 @@
 from pathlib import Path
 
+import os
 from dotenv import load_dotenv, dotenv_values
 from decouple import config
 from decouple import Csv
+from dj_database_url import parse as dburl
 
 print("Loading variables..")
 env_path = '/app/.env'
@@ -11,7 +13,7 @@ print(dotenv_conf)
 load_dotenv(dotenv_path=env_path, verbose=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -24,23 +26,27 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=['*'], cast=Csv())
+SERVER_URL = config('SERVER_URL', default='http://localhost:8952')
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'client.register',
     'client.adm_api',
     'client.payment_api',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,6 +88,13 @@ WSGI_APPLICATION = 'client.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': 'mydatabase',
+#    }
+#}
+
 DATABASES = {
      'default': {
          'ENGINE': 'django.db.backends.postgresql',
@@ -92,6 +105,12 @@ DATABASES = {
          'PORT': '5432'
      }
  }
+
+#default_dburl = 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
+#
+#DATABASES = {
+#    'default': config('DATABASE_URL', default=default_dburl, cast=dburl),
+#}
 
 
 # Password validation
