@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'client.register',
     'client.adm_api',
     'client.payment_api',
+    'client.core_api'
 ]
 
 MIDDLEWARE = [
